@@ -41,7 +41,7 @@ async function affichageMd(listeOb, enTeteStringMd){
   for (objetRegle of listeObjetR){  
 
   	if (objetRegle.isDisplayed == 1)	{		  
-    mdResult += objetRegle.codeMd; 
+    mdResult += objetRegle.codemd; 
 	}
 
   }
