@@ -21,24 +21,47 @@ async function affichageStandard(listeOb, enTeteString){
   for (objetRegle of listeObjetR){  
 
   	if (objetRegle.isDisplayed == 1)	{		  
-    mdResult_toHTML += objetRegle.codehtml; // et ainsi ajoute l'élément correspondant de la liste de string contenant les htmls à une string
+    mdResult_toHTML += objetRegle.codehtml; 
 	}
 
   }
   const div_md = document.getElementById("md_to_render");
   div_md.innerHTML = mdResult_toHTML;
 }  
+
+
+
+
+async function affichageMd(listeOb, enTeteStringMd){
+
+  mdResult = await enTeteStringMd ;
+
+  let listeObjetR = await listeOb ;
+  
+  for (objetRegle of listeObjetR){  
+
+  	if (objetRegle.isDisplayed == 1)	{		  
+    mdResult += objetRegle.codeMd; 
+	}
+
+  }
+  const div_md = document.getElementById("md_raw");
+  div_md.innerHTML = mdResult;
+}
+
   
 
 
-async function recupereToutHTML(listeRegle) {
+async function recupereToutHTMLandMD(listeRegle) {
   
   let liste_ObjetRegle = [];
   for (regle of listeRegle){
     mdResult_tocurrentFile = await recupererFichier("../code/" + regle + ".html") ; // recupere le html pour le fichier courant
+	mdRaw_tocurrentFile = await recupererFichier("../code/" + regle + ".md") ;
     let regleObjet = new Object();
 	regleObjet.nomRegle = regle;
     regleObjet.codehtml = mdResult_tocurrentFile;
+	regleObjet.codemd = mdRaw_tocurrentFile;
     regleObjet.isDisplayed = 1;
 
     liste_ObjetRegle.push(regleObjet);
@@ -59,16 +82,14 @@ async function recupereToutHTML(listeRegle) {
 
 const listeRegle = ["modules", "espaces", "module-reboot", "module-template", "module-shell", "module-yum"];      // création de la liste de règles qui sera faites en fonction des règles ayant un checkbox
 
-let tableauObjetRegle = recupereToutHTML(listeRegle);
+let tableauObjetRegle = recupereToutHTMLandMD(listeRegle);
 
-enTete = recupererFichier("../code/entete.html");
+enTeteHTML = recupererFichier("../code/entete.html");
 
-affichageStandard(tableauObjetRegle, enTete);
+enTeteMD = recupererFichier("../code/entete.md");
 
-
-
-console.log(tableauObjetRegle); 
-
+affichageStandard(tableauObjetRegle, enTeteHTML);
+affichageMd(tableauObjetRegle, enTeteMD);
 
 
 
@@ -91,6 +112,8 @@ for (let i = 0; i < checkBoxsListe.length; i++) {
 		  tableauObjet[index].isDisplayed = 0; // Enleve l'élément
 		});
     }
-	affichageStandard(tableauObjetRegle, enTete);
+	affichageStandard(tableauObjetRegle, enTeteHTML);
+	affichageMd(tableauObjetRegle, enTeteMD);
+	
 });
 }
