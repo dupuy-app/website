@@ -56,8 +56,8 @@ async function recupereToutHTMLandMD(listeRegle) {
   
   let liste_ObjetRegle = [];
   for (regle of listeRegle){
-    mdResult_tocurrentFile = await recupererFichier("../code/" + regle + ".html") ; // recupere le html pour le fichier courant
-	mdRaw_tocurrentFile = await recupererFichier("../code/" + regle + ".md") ;
+    mdResult_tocurrentFile = await recupererFichier("../code/html/" + regle + ".html") ; // recupere le html pour le fichier courant
+	mdRaw_tocurrentFile = await recupererFichier("../code/md/" + regle + ".md") ;
     let regleObjet = new Object();
 	regleObjet.nomRegle = regle;
     regleObjet.codehtml = mdResult_tocurrentFile;
@@ -84,9 +84,9 @@ const listeRegle = ["modules", "espaces", "module-reboot", "module-template", "m
 
 let tableauObjetRegle = recupereToutHTMLandMD(listeRegle);
 
-enTeteHTML = recupererFichier("../code/entete.html");
+enTeteHTML = recupererFichier("../code/html/entete.html");
 
-enTeteMD = recupererFichier("../code/entete.md");
+enTeteMD = recupererFichier("../code/md/entete.md");
 
 affichageStandard(tableauObjetRegle, enTeteHTML);
 affichageMd(tableauObjetRegle, enTeteMD);
