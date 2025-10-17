@@ -125,17 +125,7 @@ for (let i = 0; i < checkBoxsListe.length; i++) {
   checkBoxsListe[i].addEventListener('change', function() {
       
 	
-    if (this.checked) {
-        tableauObjetRegle.then(tableauObjet => {
-		  let index = tableauObjet.findIndex(objetR => objetR.nomRegle === this.id); // trouve 1 obj de la liste qui son nom == id
-		  tableauObjet[index].isDisplayed = 1; // Ajoute l'élément
-		});  
-    } else {
-        tableauObjetRegle.then(tableauObjet => {
-		  let index = tableauObjet.findIndex(objetR => objetR.nomRegle === this.id); // trouve 1 obj de la liste qui son nom == id
-		  tableauObjet[index].isDisplayed = 0; // Enleve l'élément
-		});
-    }
+
 	affichageStandard(tableauObjetRegle, enTeteHTML);
 	affichageMd(tableauObjetRegle, enTeteMD);
 	
