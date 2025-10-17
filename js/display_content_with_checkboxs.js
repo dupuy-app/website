@@ -18,13 +18,26 @@ async function affichageStandard(listeOb, enTeteString){
 
   let listeObjetR = await listeOb ;
   
-  for (objetRegle of listeObjetR){  
+  const checkboxStateSaved = localStorage.getItem('checkboxConfig');
+  
+  if (checkboxStateSaved) {   // récupere état des checkboxs depuis localstorage pour gérer l'affichage
+      const ListCheckBoxs = JSON.parse(checkboxStateSaved);
+      for (objetRegle of listeObjetR){
+        if (ListCheckBoxs[objetRegle.nomRegle] == true) {
+	      mdResult_toHTML += objetRegle.codehtml;
+	    }
+      }  
+  
+  } else {      // si localstorage est vide, affiche tout par défaut (car les checkboxs sont cochés par défaut)
+      for (objetRegle of listeObjetR){  
 
-  	if (objetRegle.isDisplayed == 1)	{		  
-    mdResult_toHTML += objetRegle.codehtml; 
-	}
-
+  	    		  
+        mdResult_toHTML += objetRegle.codehtml; 
+	    	  
+      }  
   }
+	  
+
   const div_md = document.getElementById("md_to_render");
   div_md.innerHTML = mdResult_toHTML;
 }  
@@ -37,14 +50,26 @@ async function affichageMd(listeOb, enTeteStringMd){
   mdResult = await enTeteStringMd ;
 
   let listeObjetR = await listeOb ;
+
+  const checkboxStateSaved = localStorage.getItem('checkboxConfig');
   
-  for (objetRegle of listeObjetR){  
+  if (checkboxStateSaved) {   // récupere état des checkboxs depuis localstorage pour gérer l'affichage
+      const ListCheckBoxs = JSON.parse(checkboxStateSaved);
+      for (objetRegle of listeObjetR){
+        if (ListCheckBoxs[objetRegle.nomRegle] == true) {
+	      mdResult += objetRegle.codemd;
+	    }
+      }  
+  
+  } else {      // si localstorage est vide, affiche tout par défaut (car les checkboxs sont cochés par défaut)
+      for (objetRegle of listeObjetR){  
 
-  	if (objetRegle.isDisplayed == 1)	{		  
-    mdResult += objetRegle.codemd; 
-	}
-
+  	    		  
+        mdResult += objetRegle.codemd; 
+	    	  
+      }  
   }
+  
   const div_md = document.getElementById("md_raw");
   div_md.innerHTML = mdResult;
 }
@@ -62,7 +87,6 @@ async function recupereToutHTMLandMD(listeRegle) {
 	regleObjet.nomRegle = regle;
     regleObjet.codehtml = mdResult_tocurrentFile;
 	regleObjet.codemd = mdRaw_tocurrentFile;
-    regleObjet.isDisplayed = 1;
 
     liste_ObjetRegle.push(regleObjet);
   }
