@@ -1,3 +1,72 @@
+// Sauvegarder l'état des checkboxes dans le localStorage
+function saveCheckboxesToLocalStorage() {
+  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  const checked = {};
+  checkboxes.forEach(checkbox => {
+    checked[checkbox.id] = checkbox.checked;
+  });
+  localStorage.setItem('checkboxConfig', JSON.stringify(checked));
+}
+
+// Charger l'état des checkboxes depuis le localStorage
+function loadCheckboxesFromLocalStorage() {
+  const saved = localStorage.getItem('checkboxConfig');
+  if (saved) {
+    const ListCheckBoxs = JSON.parse(saved);
+    for (const id in ListCheckBoxs) {
+      const checkbox = document.getElementById(id);
+      if (checkbox) checkbox.checked = ListCheckBoxs[id];
+    }
+  }
+}
+
+// Exporter en JSON
+function exportToJSON() {
+  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  const checked = {};
+  checkboxes.forEach(checkbox => {
+    checked[checkbox.id] = checkbox.checked;
+  });
+
+  const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(checked));
+  const a = document.createElement('a');
+  a.href = data;
+  a.download = 'checkbox_config.json';
+  a.click();
+}
+
+// Importer depuis un fichier JSON
+function importFromJSON() {
+  const input = document.getElementById('importInput');
+  const file = input.files[0];
+
+  if (!file) {
+    alert("Veuillez sélectionner un fichier JSON.");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const checked = JSON.parse(e.target.result);
+      for (const id in checked) {
+        const checkbox = document.getElementById(id);
+        if (checkbox) checkbox.checked = checked[id];
+      }
+      // Sauvegarder dans le localStorage après import
+      saveCheckboxesToLocalStorage();
+      alert("Configuration importée avec succès !");
+    } catch (error) {
+      alert("Erreur : le fichier n'est pas un JSON valide.");
+    }
+  };
+  reader.readAsText(file);
+  window.location.reload();
+}
+
+
+
+
 async function recupererFichier(url) {
   try {
     const reponse = await fetch(url);
@@ -125,9 +194,14 @@ for (let i = 0; i < checkBoxsListe.length; i++) {
   checkBoxsListe[i].addEventListener('change', function() {
       
 	
-
+    saveCheckboxesToLocalStorage();
 	affichageStandard(tableauObjetRegle, enTeteHTML);
 	affichageMd(tableauObjetRegle, enTeteMD);
 	
 });
 }
+
+
+
+// Charger les checkboxes au démarrage
+window.onload = loadCheckboxesFromLocalStorage;
