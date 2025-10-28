@@ -81,9 +81,14 @@ async function recupererFichier(url) {
 }
 
 
-async function affichageStandard(listeOb, enTeteString){
+async function affichageStandard(listeOb, enteteStringFirstPart, enteteStringLastPart){
 
-  mdResult_toHTML = await enTeteString ;
+  sautDeLigne = `
+`;
+
+  summary = await enteteStringFirstPart;
+  summaryEnd = await enteteStringLastPart;
+  mdResult_toHTML = "";
 
   let listeObjetR = await listeOb ;
   
@@ -93,20 +98,31 @@ async function affichageStandard(listeOb, enTeteString){
       const ListCheckBoxs = JSON.parse(checkboxStateSaved);
       for (objetRegle of listeObjetR){
         if (ListCheckBoxs[objetRegle.nomRegle] == true) {
-	      mdResult_toHTML += objetRegle.codehtml;
+	      
+          the_checkbox = document.getElementById(objetRegle.nomRegle);
+          label = document.querySelector(`label[for="${the_checkbox.id}"]`);
+
+          texteLabel = label.textContent;
+          summary += "<li>" + texteLabel + "</li>" + sautDeLigne;
+          mdResult_toHTML += objetRegle.codehtml;
 	    }
       }  
   
   } else {      // si localstorage est vide, affiche tout par défaut (car les checkboxs sont cochés par défaut)
       for (objetRegle of listeObjetR){  
 
-  	    		  
+  	    the_checkbox = document.getElementById(objetRegle.nomRegle);
+        label = document.querySelector(`label[for="${the_checkbox.id}"]`);
+        
+        texteLabel = label.textContent;
+        summary += "<li>" + texteLabel + "</li>" + sautDeLigne;		
         mdResult_toHTML += objetRegle.codehtml; 
 	    	  
       }  
   }
 	  
 
+  mdResult_toHTML = summary + summaryEnd + mdResult_toHTML ;
   const div_md = document.getElementById("md_to_render");
   div_md.innerHTML = mdResult_toHTML;
 }  
@@ -114,9 +130,14 @@ async function affichageStandard(listeOb, enTeteString){
 
 
 
-async function affichageMd(listeOb, enTeteStringMd){
+async function affichageMd(listeOb, enteteStringMDFirstPart, enteteStringMDLastPart){
 
-  mdResult = await enTeteStringMd ;
+  sautDeLigne = `
+`;
+
+  summaryMD = await enteteStringMDFirstPart;
+  summaryMDEnd = await enteteStringMDLastPart;
+  mdResult = "";
 
   let listeObjetR = await listeOb ;
 
@@ -126,19 +147,30 @@ async function affichageMd(listeOb, enTeteStringMd){
       const ListCheckBoxs = JSON.parse(checkboxStateSaved);
       for (objetRegle of listeObjetR){
         if (ListCheckBoxs[objetRegle.nomRegle] == true) {
-	      mdResult += objetRegle.codemd;
-	    }
+
+          the_checkbox = document.getElementById(objetRegle.nomRegle);
+          label = document.querySelector(`label[for="${the_checkbox.id}"]`);
+
+          texteLabel = label.textContent;
+          summaryMD += "  - " + texteLabel + sautDeLigne;
+          mdResult += objetRegle.codemd;
+        }
       }  
   
   } else {      // si localstorage est vide, affiche tout par défaut (car les checkboxs sont cochés par défaut)
       for (objetRegle of listeObjetR){  
 
-  	    		  
+        the_checkbox = document.getElementById(objetRegle.nomRegle);
+        label = document.querySelector(`label[for="${the_checkbox.id}"]`);
+
+        texteLabel = label.textContent;
+        summaryMD += "  - " + texteLabel + sautDeLigne;
         mdResult += objetRegle.codemd; 
-	    	  
-      }  
+
+      }
   }
   
+  mdResult = summaryMD + summaryMDEnd + mdResult ;
   const div_md = document.getElementById("md_raw");
   div_md.innerHTML = mdResult;
 }
@@ -177,12 +209,14 @@ const listeRegle = ["modules", "espaces", "module-reboot", "module-template", "m
 
 let tableauObjetRegle = recupereToutHTMLandMD(listeRegle);
 
-enTeteHTML = recupererFichier("../code/html/entete.html");
+enTeteHTMLFirstPart = recupererFichier("../code/html/enteteFirst.html");
+enTeteHTMLLastPart = recupererFichier("../code/html/enteteLast.html");
 
-enTeteMD = recupererFichier("../code/md/entete.md");
+enTeteMDFirstPart = recupererFichier("../code/md/enteteFirst.md");
+enTeteMDLastPart = recupererFichier("../code/md/enteteLast.md");
 
-affichageStandard(tableauObjetRegle, enTeteHTML);
-affichageMd(tableauObjetRegle, enTeteMD);
+affichageStandard(tableauObjetRegle, enTeteHTMLFirstPart, enTeteHTMLLastPart);
+affichageMd(tableauObjetRegle, enTeteMDFirstPart, enTeteMDLastPart);
 
 
 
@@ -195,8 +229,8 @@ for (let i = 0; i < checkBoxsListe.length; i++) {
       
 	
     saveCheckboxesToLocalStorage();
-	affichageStandard(tableauObjetRegle, enTeteHTML);
-	affichageMd(tableauObjetRegle, enTeteMD);
+	affichageStandard(tableauObjetRegle, enTeteHTMLFirstPart, enTeteHTMLLastPart);
+	affichageMd(tableauObjetRegle, enTeteMDFirstPart, enTeteMDLastPart);
 	
 });
 }
