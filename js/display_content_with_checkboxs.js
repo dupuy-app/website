@@ -55,13 +55,15 @@ function importFromJSON() {
       }
       // Sauvegarder dans le localStorage après import
       saveCheckboxesToLocalStorage();
+	  affichageStandard();
+	  affichageMd();
       alert("Configuration importée avec succès !");
     } catch (error) {
       alert("Erreur : le fichier n'est pas un JSON valide.");
     }
   };
   reader.readAsText(file);
-  window.location.reload();
+
 }
 
 
@@ -81,42 +83,43 @@ async function recupererFichier(url) {
 }
 
 
-async function affichageStandard(listeOb, enteteStringFirstPart, enteteStringLastPart){
+function affichageStandard(){
 
   sautDeLigne = `
 `;
 
-  summary = await enteteStringFirstPart;
-  summaryEnd = await enteteStringLastPart;
+  summary = sessionStorage.getItem('enteteFirst.html');
+  summaryEnd = sessionStorage.getItem('enteteLast.html');
   mdResult_toHTML = "";
 
-  let listeObjetR = await listeOb ;
+  listeRegleString = sessionStorage.getItem('liste_de_regles');
+  let listeObjetR = JSON.parse(listeRegleString);
   
   const checkboxStateSaved = localStorage.getItem('checkboxConfig');
   
   if (checkboxStateSaved) {   // récupere état des checkboxs depuis localstorage pour gérer l'affichage
       const ListCheckBoxs = JSON.parse(checkboxStateSaved);
       for (objetRegle of listeObjetR){
-        if (ListCheckBoxs[objetRegle.nomRegle] == true) {
+        if (ListCheckBoxs[objetRegle] == true) {
 	      
-          the_checkbox = document.getElementById(objetRegle.nomRegle);
+          the_checkbox = document.getElementById(objetRegle);
           label = document.querySelector(`label[for="${the_checkbox.id}"]`);
 
           texteLabel = label.textContent;
           summary += "<li>" + texteLabel + "</li>" + sautDeLigne;
-          mdResult_toHTML += objetRegle.codehtml;
+          mdResult_toHTML += sessionStorage.getItem(objetRegle + '.html');
 	    }
       }  
   
   } else {      // si localstorage est vide, affiche tout par défaut (car les checkboxs sont cochés par défaut)
       for (objetRegle of listeObjetR){  
 
-  	    the_checkbox = document.getElementById(objetRegle.nomRegle);
+  	    the_checkbox = document.getElementById(objetRegle);
         label = document.querySelector(`label[for="${the_checkbox.id}"]`);
         
         texteLabel = label.textContent;
         summary += "<li>" + texteLabel + "</li>" + sautDeLigne;		
-        mdResult_toHTML += objetRegle.codehtml; 
+        mdResult_toHTML += sessionStorage.getItem(objetRegle + '.html'); 
 	    	  
       }  
   }
@@ -125,47 +128,48 @@ async function affichageStandard(listeOb, enteteStringFirstPart, enteteStringLas
   mdResult_toHTML = summary + summaryEnd + mdResult_toHTML ;
   const div_md = document.getElementById("md_to_render");
   div_md.innerHTML = mdResult_toHTML;
-}  
+}    
 
 
 
 
-async function affichageMd(listeOb, enteteStringMDFirstPart, enteteStringMDLastPart){
+function affichageMd(){
 
   sautDeLigne = `
 `;
 
-  summaryMD = await enteteStringMDFirstPart;
-  summaryMDEnd = await enteteStringMDLastPart;
+  summaryMD = sessionStorage.getItem('enteteFirst.md');
+  summaryMDEnd = sessionStorage.getItem('enteteLast.md');
   mdResult = "";
 
-  let listeObjetR = await listeOb ;
-
+  listeRegleString = sessionStorage.getItem('liste_de_regles');
+  let listeObjetR = JSON.parse(listeRegleString);
+  
   const checkboxStateSaved = localStorage.getItem('checkboxConfig');
   
   if (checkboxStateSaved) {   // récupere état des checkboxs depuis localstorage pour gérer l'affichage
       const ListCheckBoxs = JSON.parse(checkboxStateSaved);
       for (objetRegle of listeObjetR){
-        if (ListCheckBoxs[objetRegle.nomRegle] == true) {
+        if (ListCheckBoxs[objetRegle] == true) {
 
-          the_checkbox = document.getElementById(objetRegle.nomRegle);
+          the_checkbox = document.getElementById(objetRegle);
           label = document.querySelector(`label[for="${the_checkbox.id}"]`);
 
           texteLabel = label.textContent;
           summaryMD += "  - " + texteLabel + sautDeLigne;
-          mdResult += objetRegle.codemd;
+          mdResult += sessionStorage.getItem(objetRegle + '.md');
         }
       }  
   
   } else {      // si localstorage est vide, affiche tout par défaut (car les checkboxs sont cochés par défaut)
       for (objetRegle of listeObjetR){  
 
-        the_checkbox = document.getElementById(objetRegle.nomRegle);
+        the_checkbox = document.getElementById(objetRegle);
         label = document.querySelector(`label[for="${the_checkbox.id}"]`);
 
         texteLabel = label.textContent;
         summaryMD += "  - " + texteLabel + sautDeLigne;
-        mdResult += objetRegle.codemd; 
+        mdResult += sessionStorage.getItem(objetRegle + '.md'); 
 
       }
   }
@@ -178,24 +182,33 @@ async function affichageMd(listeOb, enteteStringMDFirstPart, enteteStringMDLastP
   
 
 
-async function recupereToutHTMLandMD(listeRegle) {
+async function chargeEnSessionToutHTMLandMD(listeRegle) {
   
-  let liste_ObjetRegle = [];
+
   for (regle of listeRegle){
     mdResult_tocurrentFile = await recupererFichier("../code/html/" + regle + ".html") ; // recupere le html pour le fichier courant
 	mdRaw_tocurrentFile = await recupererFichier("../code/md/" + regle + ".md") ;
-    let regleObjet = new Object();
-	regleObjet.nomRegle = regle;
-    regleObjet.codehtml = mdResult_tocurrentFile;
-	regleObjet.codemd = mdRaw_tocurrentFile;
 
-    liste_ObjetRegle.push(regleObjet);
+
+    sessionStorage.setItem(regle + '.html', mdResult_tocurrentFile);
+	sessionStorage.setItem(regle + '.md', mdRaw_tocurrentFile);
+
   }
 
+  enTeteHTMLFirstPart = await recupererFichier("../code/html/enteteFirst.html");
+  enTeteHTMLLastPart = await recupererFichier("../code/html/enteteLast.html");
+
+  enTeteMDFirstPart = await recupererFichier("../code/md/enteteFirst.md");
+  enTeteMDLastPart = await recupererFichier("../code/md/enteteLast.md");
+
+  sessionStorage.setItem('enteteFirst.html', enTeteHTMLFirstPart);
+  sessionStorage.setItem('enteteLast.html', enTeteHTMLLastPart);
+
+  sessionStorage.setItem('enteteFirst.md', enTeteMDFirstPart);
+  sessionStorage.setItem('enteteLast.md', enTeteMDLastPart);
   
+  sessionStorage.setItem('liste_de_regles', JSON.stringify(listeRegle));
 
-
-	return liste_ObjetRegle;
 }
 
 
@@ -207,18 +220,13 @@ async function recupereToutHTMLandMD(listeRegle) {
 
 const listeRegle = ["modules", "espaces", "module-reboot", "module-template", "module-shell", "module-yum"];      // création de la liste de règles qui sera faites en fonction des règles ayant un checkbox
 
-let tableauObjetRegle = recupereToutHTMLandMD(listeRegle);
-
-enTeteHTMLFirstPart = recupererFichier("../code/html/enteteFirst.html");
-enTeteHTMLLastPart = recupererFichier("../code/html/enteteLast.html");
-
-enTeteMDFirstPart = recupererFichier("../code/md/enteteFirst.md");
-enTeteMDLastPart = recupererFichier("../code/md/enteteLast.md");
-
-affichageStandard(tableauObjetRegle, enTeteHTMLFirstPart, enTeteHTMLLastPart);
-affichageMd(tableauObjetRegle, enTeteMDFirstPart, enTeteMDLastPart);
 
 
+(async () => {
+  await chargeEnSessionToutHTMLandMD(listeRegle);
+  affichageStandard();
+  affichageMd();
+})();
 
 
 
@@ -229,8 +237,8 @@ for (let i = 0; i < checkBoxsListe.length; i++) {
       
 	
     saveCheckboxesToLocalStorage();
-	affichageStandard(tableauObjetRegle, enTeteHTMLFirstPart, enTeteHTMLLastPart);
-	affichageMd(tableauObjetRegle, enTeteMDFirstPart, enTeteMDLastPart);
+	affichageStandard();
+	affichageMd();
 	
 });
 }
