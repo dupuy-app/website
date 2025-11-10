@@ -105,7 +105,7 @@ function affichageStandard(){
           the_checkbox = document.getElementById(objetRegle);
           label = document.querySelector(`label[for="${the_checkbox.id}"]`);
 
-          texteLabel = label.textContent;
+          texteLabel = label.innerHTML;
           summary += "<li>" + texteLabel + "</li>" + sautDeLigne;
           mdResult_toHTML += sessionStorage.getItem(objetRegle + '.html');
 	    }
@@ -117,7 +117,7 @@ function affichageStandard(){
   	    the_checkbox = document.getElementById(objetRegle);
         label = document.querySelector(`label[for="${the_checkbox.id}"]`);
         
-        texteLabel = label.textContent;
+        texteLabel = label.innerHTML;
         summary += "<li>" + texteLabel + "</li>" + sautDeLigne;		
         mdResult_toHTML += sessionStorage.getItem(objetRegle + '.html'); 
 	    	  
@@ -155,7 +155,7 @@ function affichageMd(){
           the_checkbox = document.getElementById(objetRegle);
           label = document.querySelector(`label[for="${the_checkbox.id}"]`);
 
-          texteLabel = label.textContent;
+          texteLabel = label.innerHTML;
           summaryMD += "  - " + texteLabel + sautDeLigne;
           mdResult += sessionStorage.getItem(objetRegle + '.md');
         }
@@ -167,7 +167,7 @@ function affichageMd(){
         the_checkbox = document.getElementById(objetRegle);
         label = document.querySelector(`label[for="${the_checkbox.id}"]`);
 
-        texteLabel = label.textContent;
+        texteLabel = label.innerHTML;
         summaryMD += "  - " + texteLabel + sautDeLigne;
         mdResult += sessionStorage.getItem(objetRegle + '.md'); 
 
